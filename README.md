@@ -26,7 +26,6 @@ chmod +x build.sh
 
 **Kubernetes job example:**
 ```yaml
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -44,7 +43,7 @@ spec:
 ```
 
 **ArgoWorkflow example:**
-```
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow                  
 metadata:
@@ -60,7 +59,7 @@ spec:
 ```
 
 **Required RBAC:**
-```
+```yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
