@@ -72,7 +72,7 @@ spec:
         image: $MY_IMAGE:$TAG
         command: ["reaper"]
       restartPolicy: Never
-	  serviceAccountName: example
+      serviceAccountName: example
   backoffLimit: 0
 ```
 ---
