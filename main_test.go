@@ -32,9 +32,15 @@ func TestReap(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			client := fake.NewSimpleClientset(test.objs...)
 
+			p, _ := client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+
+			if len(p.Items) == 0 {
+				t.Errorf("Expected 2 pods, got %d", len(p.Items))
+			}
+
 			Reap(600, 600, []string{"asd", "asdasd"}, client.CoreV1(), false)
 
-			p, _ := client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+			p, _ = client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
 
 			if len(p.Items) != 0 {
 				t.Errorf("Expected 0 pods, got %d", len(p.Items))
@@ -44,9 +50,15 @@ func TestReap(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			client := fake.NewSimpleClientset(test.objs...)
 
+			p, _ := client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+
+			if len(p.Items) != 2 {
+				t.Errorf("Expected 2 pods, got %d", len(p.Items))
+			}
+
 			Reap(6000000, 6000000, []string{"asd", "asdasd"}, client.CoreV1(), false)
 
-			p, _ := client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+			p, _ = client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
 
 			if len(p.Items) == 0 {
 				t.Errorf("Expected 2 pods, got %d", len(p.Items))
@@ -56,9 +68,15 @@ func TestReap(t *testing.T) {
 		t.Run(test.description, func(t *testing.T) {
 			client := fake.NewSimpleClientset(test.objs...)
 
+			p, _ := client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+
+			if len(p.Items) != 2 {
+				t.Errorf("Expected 2 pods, got %d", len(p.Items))
+			}
+
 			Reap(600, 600, []string{}, client.CoreV1(), false)
 
-			p, _ := client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+			p, _ = client.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
 
 			if len(p.Items) == 0 {
 				t.Errorf("Expected 2 pods, got %d", len(p.Items))
