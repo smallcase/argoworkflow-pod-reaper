@@ -38,11 +38,13 @@ func main() {
 		config, err := rest.InClusterConfig()
 		if err != nil {
 			log.Println(err.Error())
+			return
 		}
 		// creates the clientset
 		clientset, err = kubernetes.NewForConfig(config)
 		if err != nil {
 			log.Println(err.Error())
+			return
 		}
 	}
 
@@ -52,12 +54,14 @@ func main() {
 		config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 		if err != nil {
 			log.Println(err.Error())
+			return
 		}
 
 		// create the clientset
 		clientset, err = kubernetes.NewForConfig(config)
 		if err != nil {
 			log.Println(err.Error())
+			return
 		}
 
 	}
@@ -70,9 +74,11 @@ func Reap(deleteFailedAfter int, deleteSuccessfulAfter int, namespaces []string,
 	pods, err := clientset.Pods("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Println(err.Error())
+		return
 	}
 
-	log.Println(fmt.Sprintf("Deleting pods that have failed after %d days and succeeded after %d days", deleteFailedAfter, deleteSuccessfulAfter))
+	log.Println(fmt.Sprintf("Deleting pods that failed %d days ago", deleteFailedAfter))
+	log.Println(fmt.Sprintf("Deleting pods that succeeded %d days ago", deleteSuccessfulAfter))
 
 	var wg sync.WaitGroup
 
@@ -129,7 +135,8 @@ func deletePod(namespace string, podName string, clientset v1.CoreV1Interface, d
 
 	err := clientset.Pods(namespace).Delete(context.TODO(), podName, metav1.DeleteOptions{})
 	if err != nil {
-		panic(err.Error())
+		log.Println(err.Error())
+		return
 	}
 
 	m = fmt.Sprintf("Deleted pod %s in namespace %s", podName, namespace)

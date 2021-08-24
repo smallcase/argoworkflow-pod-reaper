@@ -1,5 +1,5 @@
-FROM debian
+FROM alpine
 
-COPY ./app /app
+COPY ./reaper /usr/local/bin/
 
-ENTRYPOINT /bin/sh
+ENTRYPOINT reaper
