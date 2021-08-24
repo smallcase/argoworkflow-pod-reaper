@@ -11,6 +11,7 @@ import (
 	flag "github.com/spf13/pflag"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
@@ -21,14 +22,17 @@ func main() {
 	var deleteFailedAfter int
 	var deleteSuccessfulAfter int
 	var namespaces []string
-	var clientset *kubernetes.Clientset
+	var dryRun bool
 
+	flag.BoolVar(&dryRun, "dry-run", true, "dry run deletion")
 	flag.BoolVar(&inCluster, "in-cluster", true, "in cluster config or ~/.kubeconfig")
 	flag.IntVar(&deleteFailedAfter, "delete-failed-after", 10, "delete failed pods after x days")
 	flag.IntVar(&deleteSuccessfulAfter, "delete-successful-after", 5, "delete succesful pods after x days")
 	flag.StringSliceVar(&namespaces, "namespaces", []string{"default"}, "namespaces to delete pods from")
 
 	flag.Parse()
+
+	var clientset *kubernetes.Clientset
 
 	if inCluster {
 		config, err := rest.InClusterConfig()
@@ -58,7 +62,12 @@ func main() {
 
 	}
 
-	pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
+	Reap(deleteFailedAfter, deleteSuccessfulAfter, namespaces, clientset.CoreV1(), dryRun)
+}
+
+func Reap(deleteFailedAfter int, deleteSuccessfulAfter int, namespaces []string, clientset v1.CoreV1Interface, dryRun bool) {
+
+	pods, err := clientset.Pods("").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -78,7 +87,7 @@ func main() {
 
 							go func() {
 								defer wg.Done()
-								deletePod(v.Namespace, v.Name, clientset)
+								deletePod(v.Namespace, v.Name, clientset, dryRun)
 							}()
 
 							wg.Wait()
@@ -93,7 +102,7 @@ func main() {
 
 							go func() {
 								defer wg.Done()
-								deletePod(v.Namespace, v.Name, clientset)
+								deletePod(v.Namespace, v.Name, clientset, dryRun)
 							}()
 
 							wg.Wait()
@@ -106,10 +115,7 @@ func main() {
 
 }
 
-func deletePod(namespace string, podName string, clientset *kubernetes.Clientset) {
-
-	var dryRun bool
-	flag.BoolVar(&dryRun, "dry-run", true, "dry run deletion")
+func deletePod(namespace string, podName string, clientset v1.CoreV1Interface, dryRun bool) {
 
 	if dryRun {
 		m := fmt.Sprintf("Would delete pod %s in namespace %s", podName, namespace)
@@ -121,7 +127,7 @@ func deletePod(namespace string, podName string, clientset *kubernetes.Clientset
 	m := fmt.Sprintf("Deleting pod %s in namespace %s", podName, namespace)
 	log.Println(m)
 
-	err := clientset.CoreV1().Pods(namespace).Delete(context.TODO(), podName, metav1.DeleteOptions{})
+	err := clientset.Pods(namespace).Delete(context.TODO(), podName, metav1.DeleteOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
