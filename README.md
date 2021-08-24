@@ -26,6 +26,41 @@ chmod +x build.sh
 
 **Kubernetes job example:**
 ```yaml
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: example-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: example
+        image: $MY_IMAGE:$TAG
+        command: ["reaper"]
+      restartPolicy: Never
+      serviceAccountName: example
+  backoffLimit: 0
+```
+
+**ArgoWorkflow example:**
+```
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow                  
+metadata:
+  generateName: hello-world-    
+spec:
+  serviceAccountName: example
+  entrypoint: example          
+  templates:
+  - name: example             
+    container:
+      image: $MY_IMAGE:$TAG
+      command: [reaper]
+```
+
+**Required RBAC:**
+```
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -59,22 +94,8 @@ subjects:
 - kind: ServiceAccount
   name: example
   namespace: default
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  generateName: example-job
-spec:
-  template:
-    spec:
-      containers:
-      - name: example
-        image: $MY_IMAGE:$TAG
-        command: ["reaper"]
-      restartPolicy: Never
-      serviceAccountName: example
-  backoffLimit: 0
-```
+  ```
+
 ---
 
 | flag                      | default  | type     | usage                                                   |
