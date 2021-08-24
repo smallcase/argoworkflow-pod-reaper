@@ -10,7 +10,7 @@ go build -o app
 ./app --in-cluster=false --delete-failed-after=1 --delete-successful-after=1 --namespaces="ns1,ns2"
 ```
 
-Example command output:
+**Example command output:**
 ```
 2021/08/24 20:43:06 Deleting pods that failed 1 days ago
 2021/08/24 20:43:06 Deleting pods that succeeded 1 days ago
@@ -18,13 +18,13 @@ Example command output:
 2021/08/24 20:43:06 Would delete pod static-tester in namespace ns2
 ```
 
-Container image build:
+**Container image build:**
 ```
 chmod +x build.sh
 ./build.sh
 ```
 
-Kubernetes job example:
+**Kubernetes job example:**
 ```yaml
 apiVersion: v1
 kind: ServiceAccount
