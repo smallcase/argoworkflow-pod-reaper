@@ -78,6 +78,7 @@ rules:
   verbs:
   - get
   - list
+  - patch
   - watch
   - delete
 ---
