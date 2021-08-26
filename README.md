@@ -1,5 +1,9 @@
 # argoworkflow-pod-reaper
 
+[![release](https://github.com/smallcase/argoworkflow-pod-reaper/actions/workflows/release.yaml/badge.svg)](https://github.com/smallcase/argoworkflow-pod-reaper/actions/workflows/release.yaml)
+
+[![upload binary](https://github.com/smallcase/argoworkflow-pod-reaper/actions/workflows/upload.yaml/badge.svg)](https://github.com/smallcase/argoworkflow-pod-reaper/actions/workflows/upload.yaml)
+
 Deletes completed pods that are owned by ArgoWorkflow.
 
 ## Usage:
@@ -36,7 +40,6 @@ spec:
       containers:
       - name: example
         image: $MY_IMAGE:$TAG
-        command: ["reaper"]
       restartPolicy: Never
       serviceAccountName: example
   backoffLimit: 0
@@ -55,7 +58,6 @@ spec:
   - name: example             
     container:
       image: $MY_IMAGE:$TAG
-      command: [reaper]
 ```
 
 **Required RBAC:**
