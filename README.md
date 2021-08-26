@@ -100,10 +100,11 @@ subjects:
 
 | flag                      | default  | type     | usage                                                   |
 |---------------------------|----------|----------|---------------------------------------------------------|
-| --in-cluster              | true     | bool     | use in cluster config, or ~/.kube/config 				|
+| --in-cluster              | true     | bool     | use in cluster config, or ~/.kube/config 				        |
 | --delete-failed-after     | 10       | int      | delete failed pods after x days                         |
 | --delete-successful-after | 5        | int      | delete successful pods after x days                     |
 | --namespaces              | default  | []string | namespaces to watch                                     |
+| --dry-run                 | true     | bool     | dry run pod deletion                                    |
 
 
 
