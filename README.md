@@ -8,6 +8,12 @@ Deletes completed pods that are owned by ArgoWorkflow.
 
 ## Usage:
 
+
+```
+go test ./... -cover        
+ok      github.com/smallcase/workflow-reaper    0.008s  coverage: 48.6% of statements
+```
+
 ```
 go build -o app 
 
