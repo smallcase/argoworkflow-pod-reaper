@@ -85,7 +85,7 @@ func Reap(deleteFailedAfter int, deleteSuccessfulAfter int, namespaces []string,
 	for _, v := range pods.Items {
 		for k, v2 := range v.Labels {
 			if k == "workflows.argoproj.io/completed" && v2 == "true" {
-				if v.Status.Phase == "Succeeded" && v.CreationTimestamp.Time.Before(time.Now().AddDate(0, 0, -deleteFailedAfter)) {
+				if v.CreationTimestamp.Time.Before(time.Now().AddDate(0, 0, -deleteFailedAfter)) {
 					for _, v3 := range namespaces {
 						if v.Namespace == v3 {
 
@@ -100,8 +100,9 @@ func Reap(deleteFailedAfter int, deleteSuccessfulAfter int, namespaces []string,
 						}
 					}
 				}
-
-				if v.Status.Phase == "Failed" && v.CreationTimestamp.Time.Before(time.Now().AddDate(0, 0, -deleteSuccessfulAfter)) {
+			}
+			if k == "workflows.argoproj.io/completed" && v2 == "false" {
+				if v.CreationTimestamp.Time.Before(time.Now().AddDate(0, 0, -deleteSuccessfulAfter)) {
 					for _, v3 := range namespaces {
 						if v.Namespace == v3 {
 							wg.Add(1)

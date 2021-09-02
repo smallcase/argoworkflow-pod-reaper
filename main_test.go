@@ -11,8 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func pod(namespace, image string, phase v1.PodPhase, date metav1.Time) *v1.Pod {
-	labels := map[string]string{"workflows.argoproj.io/completed": "true"}
+func pod(labels map[string]string, namespace, image string, phase v1.PodPhase, date metav1.Time) *v1.Pod {
 	return &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Labels: labels, Name: image, CreationTimestamp: date},
 		Spec:       v1.PodSpec{Containers: []v1.Container{{Image: image}}}, Status: v1.PodStatus{Phase: phase},
@@ -20,12 +19,14 @@ func pod(namespace, image string, phase v1.PodPhase, date metav1.Time) *v1.Pod {
 }
 
 func TestReap(t *testing.T) {
+	labelsone := map[string]string{"workflows.argoproj.io/completed": "true"}
+	labelstwo := map[string]string{"workflows.argoproj.io/completed": "false"}
 	var tests = []struct {
 		description string
 		objs        []runtime.Object
 	}{
-		{"600+ days old failed", []runtime.Object{pod("asd", "a", v1.PodFailed, metav1.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC)), pod("asdasd", "b", v1.PodFailed, metav1.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC))}},
-		{"600+ days old succeeded", []runtime.Object{pod("asd", "a", v1.PodSucceeded, metav1.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC)), pod("asdasd", "b", v1.PodSucceeded, metav1.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC))}},
+		{"600+ days old failed", []runtime.Object{pod(labelstwo, "asd", "a", v1.PodFailed, metav1.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC)), pod(labelstwo, "asdasd", "b", v1.PodFailed, metav1.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC))}},
+		{"600+ days old succeeded", []runtime.Object{pod(labelsone, "asd", "a", v1.PodSucceeded, metav1.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC)), pod(labelsone, "asdasd", "b", v1.PodSucceeded, metav1.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC))}},
 	}
 
 	for _, test := range tests {
